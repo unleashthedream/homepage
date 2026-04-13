@@ -121,7 +121,8 @@
       background: var(--gold);
       border-radius: 50%;
       pointer-events: none;
-      z-index: 9999;
+      z-index: 100001;
+      /* modal(10000)より上に表示 */
       transform: translate(-50%, -50%);
       transition: transform 0.1s, opacity 0.3s;
       mix-blend-mode: screen;
@@ -134,7 +135,8 @@
       border: 1px solid rgba(201, 168, 76, 0.5);
       border-radius: 50%;
       pointer-events: none;
-      z-index: 9998;
+      z-index: 100000;
+      /* modal(10000)より上に表示 */
       transform: translate(-50%, -50%);
       transition: transform 0.15s var(--ease-out-expo), width 0.3s, height 0.3s, border-color 0.3s;
     }
@@ -556,7 +558,7 @@
 
     .nav-drawer a {
       font-family: var(--font-title);
-      font-size: 1.35rem;
+      font-size: 1rem;
       font-weight: 300;
       color: var(--cream);
       letter-spacing: 0.15em;
@@ -786,11 +788,11 @@
 
     /* TAP TO SKIP ボタン */
     .phase1-skip-wrap {
-      position: absolute;
-      bottom: 84px;
-      /* SCROLL文字の高さ(36+48+12)からパディング12を引いた位置 */
+      position: fixed;
+      bottom: 40px;
       right: 24px;
-      z-index: 10;
+      z-index: 3000;
+      /* Grain overlay (1000) や CTA(2000) より上に配置 */
       opacity: 0;
       pointer-events: none;
       transition: opacity 1s ease;
@@ -803,15 +805,24 @@
 
     .phase1-skip-btn {
       font-family: var(--font-title);
-      font-size: 0.65rem;
+      font-size: 0.75rem;
+      /* PCで見えやすいよう少し大きく */
       letter-spacing: 0.25em;
       color: var(--gold-light);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       padding: 12px;
       cursor: pointer;
-      text-shadow: 0 0 10px rgba(201, 168, 76, 0.4);
+      text-shadow: 0 0 15px rgba(201, 168, 76, 0.6);
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .phase1-skip-btn:hover {
+      color: var(--white);
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+      transform: scale(1.05);
     }
 
     /* ボタン背景のキラキラした光 */
@@ -845,8 +856,7 @@
 
     @media (max-width: 768px) {
       .phase1-skip-wrap {
-        bottom: 64px;
-        /* 16 + 48 + 12 - 12 */
+        bottom: 30px;
         right: 16px;
       }
 
@@ -2219,16 +2229,43 @@
       display: flex;
       gap: 16px;
       overflow-x: auto;
-      padding: 5px 5px 10px 5px;
+      padding: 5px 5px 15px 5px;
+      /* 下部に少し余裕を持たせる */
       margin: 0 -5px;
       -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-      /* Firefox */
+      scrollbar-width: thin;
+      scrollbar-color: rgba(201, 168, 76, 0.3) transparent;
     }
 
+    /* PCなどマウス操作環境ではスクロールバーを薄く表示して操作性を確保 */
     .cast-scroll-container::-webkit-scrollbar {
-      display: none;
-      /* Chrome, Safari, Opera */
+      height: 4px;
+      display: block;
+    }
+
+    .cast-scroll-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .cast-scroll-container::-webkit-scrollbar-thumb {
+      background: rgba(201, 168, 76, 0.2);
+      border-radius: 10px;
+    }
+
+    .cast-scroll-container::-webkit-scrollbar-thumb:hover {
+      background: rgba(201, 168, 76, 0.5);
+    }
+
+    /* スマホではスクロールバーを非表示（スワイプが主脈のため） */
+    @media (max-width: 768px) {
+      .cast-scroll-container {
+        scrollbar-width: none;
+        padding-bottom: 5px;
+      }
+
+      .cast-scroll-container::-webkit-scrollbar {
+        display: none;
+      }
     }
 
     .cast-card {
@@ -4142,7 +4179,8 @@
       position: fixed;
       right: 24px;
       bottom: 32px;
-      z-index: 800;
+      z-index: 2000;
+      /* Grain overlay (1000) や SKIPボタン (1100) より上に表示 */
       opacity: 0;
       transform: translateY(16px);
       transition: opacity 0.5s var(--ease-out-expo), transform 0.5s var(--ease-out-expo);
@@ -4834,11 +4872,18 @@
 
   <!-- ① 右下固定FABボタン -->
   <div id="cta-fab">
-    <a href="https://unleash-the-dream-2026.peatix.com/" target="_blank" rel="noopener" class="cta-fab-inner"
+    <a href="https://unleash-the-dream-2026.peatix.com/" target="_blank" rel="noopener noreferrer" class="cta-fab-inner"
       id="cta-fab-inner">
       <span class="cta-fab-sub">数量限定｜先行早割実施中</span>
       <span class="cta-fab-main">今すぐ席を確保する</span>
     </a>
+  </div>
+
+  <div class="phase1-skip-wrap" id="phase1Skip">
+    <div class="phase1-skip-glow"></div>
+    <div class="phase1-skip-btn">
+      <span>»</span> TAP TO SKIP
+    </div>
   </div>
 
   <!-- ═══ NAVIGATION ═══ -->
@@ -4849,12 +4894,11 @@
         <span>夢を、解き放てー</span>
       </a>
       <ul class="nav-links">
-        <li><a href="#event-content">CONTENTS<span>イベント内容</span></a></li>
-        <li><a href="#taiken">EXPERIENCE<span>体験できること</span></a></li>
-        <li><a href="#trust">STORY<span>この物語の始まり</span></a></li>
-        <li><a href="#voices">VOICES<span>参加者の声</span></a></li>
-        <li><a href="#info">INFO<span>開催情報</span></a></li>
-        <li><a href="#faq">FAQ<span>よくある質問</span></a></li>
+        <li><a href="#event-content">CONTENTS<span><br>イベント内容</span></a></li>
+        <li><a href="#trust">STORY<span><br>物語の始まり</span></a></li>
+        <li><a href="#voices">VOICES<span><br>参加者の声</span></a></li>
+        <li><a href="#info">INFO<span><br>開催情報</span></a></li>
+        <li><a href="#faq">FAQ<span><br>よくある質問</span></a></li>
       </ul>
       <div class="nav-right">
         <div class="nav-sns">
@@ -4881,12 +4925,12 @@
   </nav>
 
   <nav class="nav-drawer" id="navDrawer">
-    <a href="#event-content" class="drawer-link">CONTENTS</a>
-    <a href="#taiken" class="drawer-link">EXPERIENCE</a>
-    <a href="#story" class="drawer-link">STORY</a>
-    <a href="#voices" class="drawer-link">VOICES</a>
-    <a href="#info" class="drawer-link">INFO</a>
-    <a href="#faq" class="drawer-link">FAQ</a>
+    <a href="#event-content" class="drawer-link">CONTENTS / イベント内容</a>
+    <a href="#taiken" class="drawer-link">EXPERIENCE / 体験できること</a>
+    <a href="#story" class="drawer-link">STORY / 物語の始まり</a>
+    <a href="#voices" class="drawer-link">VOICES / 参加者の声</a>
+    <a href="#info" class="drawer-link">INFO / 開催情報</a>
+    <a href="#faq" class="drawer-link">FAQ / よくある質問</a>
     <a href="#closing" class="btn-primary"
       style="font-size:0.75rem;padding:14px 32px;margin-top:8px;"><span>チケットを申し込む</span></a>
     <div class="drawer-sns">
@@ -4926,12 +4970,7 @@
       <span>SCROLL</span>
       <div class="scroll-line"></div>
     </div>
-    <div class="phase1-skip-wrap" id="phase1Skip">
-      <div class="phase1-skip-glow"></div>
-      <div class="phase1-skip-btn">
-        <span>»</span> TAP TO SKIP
-      </div>
-    </div>
+
   </section>
 
   <!-- ═══ HERO PHASE 2 ═══ -->
@@ -5396,12 +5435,19 @@
             <h4 class="cast-group-title">物語のガイド役<div class="cast-swipe-hint">SWIPE <span>▷</span></div>
             </h4>
             <div class="cast-scroll-container">
-              <div class="cast-card" data-name="宮原 周作" data-title="物語のガイド役" data-role="スピーチ" data-bio="第一回に続き、今回もスピーカーとして登壇。
+              <div class="cast-card" data-name="高崎 将樹" data-title="物語のガイド役" data-role="ナビゲーター"
+                data-bio="株式会社BayBe代表取締役。薬局業界で部長職を務める傍ら、キャリアコーチングの最大手企業運営のコーチングスクールでMVPを受賞。その後は独立・起業し、経営者やプロアスリートを始め1000人以上へコーチングを提供。「人の可能性を最大化」する事業に命を燃やす。"
+                data-img="img/member/masaki.png" data-twitter="https://x.com/MA_Kun_procoach">
+                <div class="cast-card-img-wrap"><img src="img/member/masaki.png" alt="" class="cast-card-img"></div>
+                <div class="cast-card-name">高崎 将樹</div>
+                <div class="cast-card-role">ナビゲーター</div>
+              </div>
+              <div class="cast-card" data-name="宮原 周作" data-title="物語のガイド役" data-role="語り" data-bio="第一回に続き、今回もスピーカーとして登壇。
                           あれから見える景色に大きな変化。夢は外ではなく、あなた自身の中に。あなたの心を解き放ち、一歩踏み出すきっかけになります。"
                 data-img="img/member/shusaku.png">
                 <div class="cast-card-img-wrap"><img src="img/member/shusaku.png" alt="" class="cast-card-img"></div>
                 <div class="cast-card-name">宮原 周作</div>
-                <div class="cast-card-role">スピーチ</div>
+                <div class="cast-card-role">語り</div>
               </div>
               <div class="cast-card" data-name="ゆかっち" data-title="物語のガイド役" data-role="獅子舞"
                 data-bio="枠に収まらない感性で世界を揺らすアーティスト・ゆかっち。人の心に火を灯し、本音と可能性を引き出す存在。出会った人の人生を動かす、熱と愛の表現者。"
@@ -5430,7 +5476,7 @@
                 data-insta="https://www.instagram.com/seisuke_amano">
                 <div class="cast-card-img-wrap"><img src="img/member/seisuke.png" alt="" class="cast-card-img"></div>
                 <div class="cast-card-name">天野 盛介</div>
-                <div class="cast-card-role">ピアノ演奏</div>
+                <div class="cast-card-role">ピアノ</div>
               </div>
               <div class="cast-card" data-name="大森 友子" data-title="物語のガイド役" data-role="舞台監督"
                 data-bio="第1回に続き、運営・制作・舞台監督を務めます。運営陣、出演者の想いを形にし、舞台裏から届けます。夢を解き放て！" data-img="img/member/tomoko.jpg">
@@ -5877,12 +5923,12 @@
           <p><span class="negative-marker" style="font-weight: 500;">夢への一歩は、ここから始まります。</span></p>
         </div>
         <a href="https://line.me/ti/g2/Bs4nXN1sJwzx7kqawLDonIBcMG2gdUBZGv4Uyw?utm_source=invitation&utm_medium=link_copy&utm_campaign=default"
-          class="btn-line">
+          class="btn-line" target="_blank" rel="noopener noreferrer">
           <svg viewBox="0 0 20 20" fill="white">
             <path
               d="M10 2C5.6 2 2 5.1 2 8.9c0 2.4 1.4 4.5 3.5 5.8L4.7 18l3.5-1.7c.6.1 1.2.2 1.8.2 4.4 0 8-3.1 8-6.9C18 5.1 14.4 2 10 2z" />
           </svg>
-          オープンチャットに参加する
+          オープンチャットに<br>参加する
         </a>
       </div>
 
@@ -6019,7 +6065,8 @@
         <p style="font-size: 1.2rem; font-weight: 700; line-height: 2.5">一人で見る夢より、 <br>誰かと一緒に見た夢のほうが、<br>現実になりやすいから。</p>
       </div>
       <div class="share-buttons reveal reveal-delay-3">
-        <a href="https://twitter.com/intent/tweet?text=%23UnleashTheDream" class="share-btn share-x">
+        <a href="https://twitter.com/intent/tweet?text=https%3A%2F%2Funleash-the-dream.com%0A%23unleashthedream%20%23%E5%A4%A2%E3%82%92%E8%A7%A3%E3%81%8D%E6%94%BE%E3%81%A6"
+          class="share-btn share-x" target="_blank" rel="noopener noreferrer">
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path
               d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
@@ -6027,7 +6074,7 @@
           Xでシェア
         </a>
         <a href="https://social-plugins.line.me/lineit/share?url=https%3A%2F%2Fline.me%2Fen&text=text"
-          class="share-btn share-line">
+          class="share-btn share-line" target="_blank" rel="noopener noreferrer">
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path
               d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63h2.386c.349 0 .63.285.63.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63.349 0 .631.285.631.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314" />
@@ -6221,42 +6268,55 @@
      JAVASCRIPT
 ═══════════════════════════════════════════ -->
   <script>
-    /* ── Custom Cursor（添付HTMLより） ── */
+    /* ── Custom Cursor: マウス操作環境のみ（タッチデバイスはスキップ） ── */
+    const _isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     const cursor = document.getElementById('cursor');
     const cursorRing = document.getElementById('cursorRing');
-    let mouseX = 0, mouseY = 0;
-    let ringX = 0, ringY = 0;
 
-    document.addEventListener('mousemove', e => {
-      mouseX = e.clientX; mouseY = e.clientY;
-      cursor.style.left = mouseX + 'px';
-      cursor.style.top = mouseY + 'px';
-    });
+    if (!_isTouchDevice && cursor && cursorRing) {
+      let mouseX = 0, mouseY = 0;
+      let ringX = 0, ringY = 0;
 
-    const lerp = (a, b, t) => a + (b - a) * t;
-    function animateCursor() {
-      ringX = lerp(ringX, mouseX, 0.12);
-      ringY = lerp(ringY, mouseY, 0.12);
-      cursorRing.style.left = ringX + 'px';
-      cursorRing.style.top = ringY + 'px';
-      requestAnimationFrame(animateCursor);
+      document.addEventListener('mousemove', e => {
+        mouseX = e.clientX; mouseY = e.clientY;
+        cursor.style.left = mouseX + 'px';
+        cursor.style.top = mouseY + 'px';
+      });
+
+      const lerp = (a, b, t) => a + (b - a) * t;
+      function animateCursor() {
+        ringX = lerp(ringX, mouseX, 0.12);
+        ringY = lerp(ringY, mouseY, 0.12);
+        cursorRing.style.left = ringX + 'px';
+        cursorRing.style.top = ringY + 'px';
+        requestAnimationFrame(animateCursor);
+      }
+      animateCursor();
+
+      document.addEventListener('mouseover', e => {
+        if (!e.target || typeof e.target.closest !== 'function') return;
+        const el = e.target.closest('a, button, .cast-card, .lb-trigger, .phase1-skip-btn, .phase1-scroll, .phase2-scroll, .drawer-link');
+        if (el) {
+          cursorRing.style.width = '56px';
+          cursorRing.style.height = '56px';
+          cursorRing.style.borderColor = 'rgba(201,168,76,0.8)';
+          cursor.style.transform = 'translate(-50%,-50%) scale(1.5)';
+        }
+      });
+      document.addEventListener('mouseout', e => {
+        if (!e.target || typeof e.target.closest !== 'function') return;
+        const el = e.target.closest('a, button, .cast-card, .lb-trigger, .phase1-skip-btn, .phase1-scroll, .phase2-scroll, .drawer-link');
+        if (el) {
+          cursorRing.style.width = '36px';
+          cursorRing.style.height = '36px';
+          cursorRing.style.borderColor = 'rgba(201,168,76,0.5)';
+          cursor.style.transform = 'translate(-50%,-50%) scale(1)';
+        }
+      });
     }
-    animateCursor();
 
-    document.querySelectorAll('a, button').forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        cursorRing.style.width = '56px';
-        cursorRing.style.height = '56px';
-        cursorRing.style.borderColor = 'rgba(201,168,76,0.8)';
-        cursor.style.transform = 'translate(-50%,-50%) scale(1.5)';
-      });
-      el.addEventListener('mouseleave', () => {
-        cursorRing.style.width = '36px';
-        cursorRing.style.height = '36px';
-        cursorRing.style.borderColor = 'rgba(201,168,76,0.5)';
-        cursor.style.transform = 'translate(-50%,-50%) scale(1)';
-      });
-    });
+    /* ── lerp (カーソルコード外でも使用するためグローバル定義) ── */
+    const lerp = (a, b, t) => a + (b - a) * t;
 
     /* ── Nav scroll ── */
     const nav = document.getElementById('nav');
@@ -6328,13 +6388,14 @@
       }
 
       window.addEventListener('click', skipAnimation, { once: true });
-      // マウススクロールやタッチ操作で意図せずアニメーションが途中終了しないように、
-      // 画面クリック時のみアニメーションをスキップするように変更
-      // window.addEventListener('touchstart', skipAnimation, { once: true, passive: true });
-      // window.addEventListener('wheel', skipAnimation, { once: true, passive: true });
+      // モバイル（タッチデバイス）ではtouchstartでもスキップできるようにする
+      if (_isTouchDevice) {
+        window.addEventListener('touchstart', skipAnimation, { once: true, passive: true });
+      }
 
       // 1: 冒頭行を中央でフェードイン
       timeouts.push(setTimeout(function () {
+        if (isFinished) return;
         firstLine.classList.add('lit');
         if (skipBtn) skipBtn.classList.add('visible');
       }, 1000));
@@ -6764,6 +6825,11 @@
         rafId = requestAnimationFrame(update);
       }, { passive: true });
 
+      // iOS Safari対応: touchendでも強制チェック（スクロール後に即時反映させる）
+      window.addEventListener('touchend', function () {
+        setTimeout(update, 100);
+      }, { passive: true });
+
       // 初回
       update();
 
@@ -7102,6 +7168,20 @@
 
       sections.forEach(function (sec) {
         sectionObserver.observe(sec);
+      });
+    })();
+
+    /* ── Horizontal Scroll by Mouse Wheel for PC ── */
+    (function () {
+      const scrollContainers = document.querySelectorAll('.cast-scroll-container');
+      scrollContainers.forEach(container => {
+        container.addEventListener('wheel', (e) => {
+          // 垂直スクロールを横スクロールに変換
+          if (e.deltaY !== 0 && Math.abs(e.deltaX) < Math.abs(e.deltaY)) {
+            e.preventDefault();
+            container.scrollLeft += e.deltaY;
+          }
+        }, { passive: false });
       });
     })();
   </script>
