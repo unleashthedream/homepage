@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<title>Concert Wall — Display</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #08070d;
+    --bg-2: #14101f;
+    --ink: #f4f1f8;
+    --ink-dim: #8d84a3;
+    --pink: #ff3d81;
+    --cyan: #34f5c5;
+    --amber: #ffb238;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at 50% 110%, var(--bg-2) 0%, var(--bg) 60%);
+    overflow: hidden;
+    font-family: "Inter", sans-serif;
+  }
+
+  /* Ambient sweeping spotlight — the one piece of background motion */
+  .sweep {
+    position: fixed;
+    top: -20%;
+    left: 50%;
+    width: 140vmax;
+    height: 140vmax;
+    transform: translateX(-50%);
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      rgba(255, 61, 129, 0.05) 8deg,
+      transparent 20deg,
+      transparent 340deg
+    );
+    animation: rotate 22s linear infinite;
+    pointer-events: none;
+  }
+
+  @keyframes rotate {
+    from { transform: translateX(-50%) rotate(0deg); }
+    to   { transform: translateX(-50%) rotate(360deg); }
+  }
+
+  header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 40px;
+    z-index: 10;
+  }
+
+  .brand {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brand .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--pink);
+    box-shadow: 0 0 12px 2px var(--pink);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.75); }
+  }
+
+  .qr-hint {
+    font-size: 13px;
+    color: var(--ink-dim);
+    letter-spacing: 0.04em;
+  }
+
+  .stage {
+    position: fixed;
+    inset: 0;
+  }
+
+  .chip {
+    position: absolute;
+    bottom: -140px;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 500;
+    font-size: clamp(20px, 2.6vw, 34px);
+    color: var(--ink);
+    padding: 16px 26px;
+    border-radius: 999px;
+    white-space: nowrap;
+    background: rgba(20, 16, 31, 0.55);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.08);
+    animation-name: rise, sway;
+    animation-timing-function: linear, ease-in-out;
+    animation-iteration-count: 1, infinite;
+    will-change: transform, opacity;
+  }
+
+  @keyframes rise {
+    0%   { bottom: -140px; opacity: 0; }
+    6%   { opacity: 1; }
+    88%  { opacity: 1; }
+    100% { bottom: 108vh; opacity: 0; }
+  }
+
+  @keyframes sway {
+    0%, 100% { margin-left: 0; }
+    50%      { margin-left: var(--sway, 24px); }
+  }
+
+  .empty-state {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    color: var(--ink-dim);
+    text-align: center;
+    transition: opacity 0.6s ease;
+  }
+
+  .empty-state .big {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: clamp(28px, 4vw, 48px);
+    color: var(--ink);
+    letter-spacing: 0.01em;
+  }
+
+  .empty-state.hide {
+    opacity: 0;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+  <div class="sweep"></div>
+
+  <header>
+    <div class="brand"><span class="dot"></span>CONCERT WALL</div>
+    <div class="qr-hint">QRを読み取ってメッセージを送ろう</div>
+  </header>
+
+  <div class="stage" id="stage"></div>
+
+  <div class="empty-state" id="emptyState">
+    <div class="big">まだメッセージはありません</div>
+    <div>QRコードを読み取って、最初の一言を送ってみよう</div>
+  </div>
+
+  <script>
+    // Plain WebSocket — no Socket.io — so this same client code will also
+    // work against the future Cloudflare Durable Object version.
+    const wsProtocol = location.protocol === "https:" ? "wss:" : "ws:";
+    const socket = new WebSocket(`${wsProtocol}//${location.host}/ws`);
+
+    function send(obj) {
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(obj));
+      }
+    }
+
+    const stage = document.getElementById("stage");
+    const emptyState = document.getElementById("emptyState");
+
+    const COLORS = ["#ff3d81", "#34f5c5", "#ffb238"];
+    const MAX_ON_SCREEN = 40;
+    let onScreen = 0;
+    const seen = new Set();
+
+    function colorFor(index) {
+      return COLORS[index % COLORS.length];
+    }
+
+    function spawnChip(message, colorIndex) {
+      if (seen.has(message.id)) return;
+      seen.add(message.id);
+
+      emptyState.classList.add("hide");
+
+      // Simple backpressure: if the screen is saturated, drop the oldest
+      // chip early rather than layering forever.
+      if (onScreen >= MAX_ON_SCREEN) {
+        const oldest = stage.querySelector(".chip");
+        if (oldest) oldest.remove();
+        onScreen = Math.max(0, onScreen - 1);
+      }
+
+      const chip = document.createElement("div");
+      chip.className = "chip";
+
+      // Text is set via textContent only — never innerHTML — so posted
+      // text can never be interpreted as markup.
+      chip.textContent = message.text;
+
+      const color = colorFor(colorIndex);
+      chip.style.color = color;
+      chip.style.boxShadow = `0 0 24px -6px ${color}88`;
+      chip.style.borderColor = `${color}55`;
+
+      const left = 6 + Math.random() * 78; // vw, keep clear of edges
+      chip.style.left = `${left}vw`;
+
+      const duration = 13 + Math.random() * 6;
+      const swayAmount = (Math.random() > 0.5 ? 1 : -1) * (16 + Math.random() * 20);
+      chip.style.setProperty("--sway", `${swayAmount}px`);
+      chip.style.animationDuration = `${duration}s, ${2.5 + Math.random() * 1.5}s`;
+
+      chip.addEventListener("animationend", (e) => {
+        if (e.animationName === "rise") {
+          chip.remove();
+          onScreen = Math.max(0, onScreen - 1);
+        }
+      });
+
+      stage.appendChild(chip);
+      onScreen += 1;
+    }
+
+    let colorCursor = 0;
+    function nextColorIndex() {
+      colorCursor = (colorCursor + 1) % COLORS.length;
+      return colorCursor;
+    }
+
+    socket.addEventListener("open", () => {
+      send({ type: "history" });
+    });
+
+    socket.addEventListener("message", (event) => {
+      let data;
+      try {
+        data = JSON.parse(event.data);
+      } catch {
+        return;
+      }
+
+      if (data.type === "history") {
+        // Replay recent history with a slight stagger so a freshly
+        // connected screen doesn't get slammed all at once.
+        data.messages.forEach((m, i) => {
+          setTimeout(() => spawnChip(m, nextColorIndex()), i * 250);
+        });
+        return;
+      }
+
+      if (data.type === "message") {
+        spawnChip(data.message, nextColorIndex());
+      }
+    });
+  </script>
+</body>
+</html>

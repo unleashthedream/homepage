@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<title>Concert Wall — メッセージを送る</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #08070d;
+    --bg-2: #14101f;
+    --card: #17131f;
+    --ink: #f4f1f8;
+    --ink-dim: #8d84a3;
+    --pink: #ff3d81;
+    --cyan: #34f5c5;
+    --amber: #ffb238;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    min-height: 100%;
+    background: radial-gradient(ellipse at 50% -10%, var(--bg-2) 0%, var(--bg) 55%);
+    color: var(--ink);
+    font-family: "Inter", sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .wrap {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    padding: max(28px, env(safe-area-inset-top)) 22px max(28px, env(safe-area-inset-bottom));
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.03em;
+    color: var(--ink-dim);
+  }
+
+  .brand .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--pink);
+    box-shadow: 0 0 10px 2px var(--pink);
+  }
+
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 24px 0 8px;
+  }
+
+  h1 {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: clamp(28px, 8vw, 38px);
+    line-height: 1.15;
+    margin: 0 0 8px;
+  }
+
+  h1 .accent {
+    color: var(--pink);
+  }
+
+  .sub {
+    color: var(--ink-dim);
+    font-size: 15px;
+    margin: 0 0 28px;
+    line-height: 1.6;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .field {
+    position: relative;
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 18px 18px 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .field:focus-within {
+    border-color: var(--pink);
+    box-shadow: 0 0 0 4px rgba(255,61,129,0.12);
+  }
+
+  textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    color: var(--ink);
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 20px;
+    line-height: 1.5;
+    min-height: 84px;
+  }
+
+  textarea::placeholder {
+    color: #5a516e;
+  }
+
+  .meta-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 6px;
+  }
+
+  .counter {
+    font-size: 12px;
+    color: var(--ink-dim);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .counter.warn { color: var(--amber); }
+  .counter.max { color: var(--pink); }
+
+  button {
+    appearance: none;
+    border: none;
+    border-radius: 999px;
+    padding: 18px;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: 0.02em;
+    color: #08070d;
+    background: linear-gradient(120deg, var(--pink), #ff7ab0);
+    box-shadow: 0 12px 30px -10px rgba(255,61,129,0.55);
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  button:active {
+    transform: scale(0.97);
+  }
+
+  button:disabled {
+    opacity: 0.45;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  .status {
+    min-height: 22px;
+    margin-top: 14px;
+    font-size: 14px;
+    text-align: center;
+    transition: opacity 0.25s ease;
+  }
+
+  .status.ok { color: var(--cyan); }
+  .status.err { color: var(--amber); }
+
+  footer {
+    text-align: center;
+    color: #4d4560;
+    font-size: 12px;
+    padding-top: 22px;
+  }
+
+  /* success flash on the field when a message lands */
+  @keyframes flash {
+    0%   { box-shadow: 0 0 0 0 rgba(52, 245, 197, 0.5); }
+    100% { box-shadow: 0 0 0 14px rgba(52, 245, 197, 0); }
+  }
+
+  .field.sent {
+    animation: flash 0.6s ease-out;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span>CONCERT WALL</div>
+
+    <main>
+      <h1>今、伝えたい<br><span class="accent">ひとこと</span>を。</h1>
+      <p class="sub">送信した文字がステージのスクリーンに映し出されます。名前は表示されません。</p>
+
+      <form id="postForm">
+        <div class="field" id="field">
+          <textarea
+            id="text"
+            maxlength="60"
+            rows="3"
+            placeholder="ここに入力…"
+            autocomplete="off"
+            autocapitalize="sentences"
+          ></textarea>
+          <div class="meta-row">
+            <span class="counter" id="counter">0 / 60</span>
+          </div>
+        </div>
+
+        <button type="submit" id="sendBtn">スクリーンに送る</button>
+        <div class="status" id="status"></div>
+      </form>
+    </main>
+
+    <footer>Concert Wall — live text, no signup</footer>
+  </div>
+
+  <script>
+    // Plain WebSocket — no Socket.io — so this same client code will also
+    // work against the future Cloudflare Durable Object version.
+    const wsProtocol = location.protocol === "https:" ? "wss:" : "ws:";
+    const socket = new WebSocket(`${wsProtocol}//${location.host}/ws`);
+
+    function send(obj) {
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(obj));
+      }
+    }
+
+    const form = document.getElementById("postForm");
+    const field = document.getElementById("field");
+    const textarea = document.getElementById("text");
+    const counter = document.getElementById("counter");
+    const sendBtn = document.getElementById("sendBtn");
+    const status = document.getElementById("status");
+
+    const MAX_LEN = 60;
+    let cooling = false;
+
+    function updateCounter() {
+      const len = textarea.value.length;
+      counter.textContent = `${len} / ${MAX_LEN}`;
+      counter.classList.toggle("warn", len >= MAX_LEN - 10 && len < MAX_LEN);
+      counter.classList.toggle("max", len >= MAX_LEN);
+    }
+
+    textarea.addEventListener("input", updateCounter);
+
+    function setStatus(text, kind) {
+      status.textContent = text;
+      status.className = "status" + (kind ? ` ${kind}` : "");
+    }
+
+    function startCooldown(ms) {
+      cooling = true;
+      sendBtn.disabled = true;
+      let remaining = Math.ceil(ms / 1000);
+      const original = "スクリーンに送る";
+      sendBtn.textContent = `少し待ってね (${remaining})`;
+      const interval = setInterval(() => {
+        remaining -= 1;
+        if (remaining <= 0) {
+          clearInterval(interval);
+          sendBtn.textContent = original;
+          sendBtn.disabled = false;
+          cooling = false;
+        } else {
+          sendBtn.textContent = `少し待ってね (${remaining})`;
+        }
+      }, 1000);
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (cooling) return;
+
+      const value = textarea.value.trim();
+      if (!value) {
+        setStatus("文字を入力してください", "err");
+        return;
+      }
+
+      send({ type: "post", text: value });
+      setStatus("送信中…", "");
+    });
+
+    socket.addEventListener("message", (event) => {
+      let data;
+      try {
+        data = JSON.parse(event.data);
+      } catch {
+        return;
+      }
+
+      if (data.type === "accepted") {
+        setStatus("スクリーンに届きました ✓", "ok");
+        textarea.value = "";
+        updateCounter();
+        field.classList.remove("sent");
+        void field.offsetWidth; // restart animation
+        field.classList.add("sent");
+        startCooldown(3000);
+        return;
+      }
+
+      if (data.type === "rejected") {
+        if (data.reason === "too-fast") {
+          setStatus("連続投稿はできません。少し待ってね", "err");
+        } else if (data.reason === "empty") {
+          setStatus("文字を入力してください", "err");
+        } else {
+          setStatus("送信できませんでした。もう一度お試しください", "err");
+        }
+      }
+    });
+
+    updateCounter();
+  </script>
+</body>
+</html>
