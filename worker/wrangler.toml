@@ -1,0 +1,21 @@
+# Cloudflare Worker + Durable Object configuration.
+# Lives at: homepage/worker/wrangler.toml
+#
+# In the Cloudflare dashboard (Settings > Build > Root directory), set the
+# Root directory to `worker` so Cloudflare knows to look for this file
+# inside the `worker/` subfolder of the `homepage` repo, not the repo root.
+
+name = "concert-wall"
+main = "src/index.js"
+compatibility_date = "2026-01-01"
+
+[[durable_objects.bindings]]
+name = "ROOM"
+class_name = "Room"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Room"]
+
+[assets]
+directory = "./public"
