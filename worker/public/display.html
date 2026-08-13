@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&family=Noto+Sans+JP:wght@400;500;700&display=swap"
         rel="stylesheet">
     <style>
         :root {
@@ -33,7 +33,7 @@
             height: 100%;
             background: radial-gradient(ellipse at 50% 110%, var(--bg-2) 0%, var(--bg) 60%);
             overflow: hidden;
-            font-family: "Inter", sans-serif;
+            font-family: "Noto Sans JP", "Inter", sans-serif;
         }
 
         /* Ambient sweeping spotlight — background motion */
@@ -122,17 +122,22 @@
 
         .chip {
             position: absolute;
-            bottom: -140px;
-            font-family: "Space Grotesk", sans-serif;
+            bottom: -160px;
+            font-family: "Space Grotesk", "Noto Sans JP", sans-serif;
             font-weight: 500;
-            font-size: clamp(20px, 2.6vw, 34px);
+            font-size: clamp(18px, 2.2vw, 28px);
             color: var(--ink);
-            padding: 16px 26px;
-            border-radius: 999px;
-            white-space: nowrap;
-            background: rgba(20, 16, 31, 0.55);
-            backdrop-filter: blur(6px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 14px 24px;
+            border-radius: 24px;
+            max-width: min(320px, 24vw);
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            line-height: 1.45;
+            text-align: center;
+            background: rgba(20, 16, 31, 0.65);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             animation-name: rise, sway;
             animation-timing-function: linear, ease-in-out;
             animation-iteration-count: 1, infinite;
@@ -141,7 +146,7 @@
 
         @keyframes rise {
             0% {
-                bottom: -140px;
+                bottom: -160px;
                 opacity: 0;
             }
 
@@ -182,14 +187,6 @@
             color: var(--ink-dim);
             text-align: center;
             transition: opacity 0.6s ease;
-        }
-
-        .empty-state .big {
-            font-family: "Space Grotesk", sans-serif;
-            font-weight: 700;
-            font-size: clamp(28px, 4vw, 48px);
-            color: var(--ink);
-            letter-spacing: 0.01em;
         }
 
         .empty-state.hide {
@@ -235,8 +232,8 @@
         let onScreen = 0;
         const seen = new Set();
 
-        // ── レーン（列）位置管理 (被りゼロの広め3レーン配置) ────────────────
-        const LANES_LEFT_VW = [8, 38, 68]; // 左・中央・右の広め3レーン
+        // ── レーン（列）位置管理 ─────────────────────────
+        const LANES_LEFT_VW = [8, 38, 68];
         const laneLastUsed = new Array(LANES_LEFT_VW.length).fill(0);
         let lastLaneIndex = -1;
 
@@ -245,7 +242,6 @@
             let bestLane = 0;
             let maxElapsed = -1;
 
-            // 直近で最も使われておらず、前回と重複しないレーンを選択
             for (let i = 0; i < LANES_LEFT_VW.length; i++) {
                 if (i === lastLaneIndex && LANES_LEFT_VW.length > 1) continue;
                 const elapsed = now - laneLastUsed[i];
@@ -259,11 +255,11 @@
             lastLaneIndex = bestLane;
 
             const baseLeft = LANES_LEFT_VW[bestLane];
-            const jitter = (Math.random() - 0.5) * 6; // ±3vwの微ブレ
+            const jitter = (Math.random() - 0.5) * 6;
             return Math.min(75, Math.max(5, baseLeft + jitter));
         }
 
-        // ── キュー管理 (垂直衝突防止の十分な間隔確保) ──────────────────
+        // ── キュー管理 ──────────────────
         const messageQueue = [];
         let isProcessingQueue = false;
 
@@ -284,7 +280,6 @@
             const m = messageQueue.shift();
             spawnChip(m, nextColorIndex());
 
-            // 垂直方向の被りを防ぐため、最小1.8秒の間隔をあけて打ち上げ
             const delay = messageQueue.length > 8 ? 1400 : 2000;
             setTimeout(() => {
                 isProcessingQueue = false;
@@ -307,7 +302,13 @@
 
             const chip = document.createElement("div");
             chip.className = "chip";
-            chip.textContent = message.text || message;
+            
+            // 最大25文字制限（フロントエンド側制限のセーフティガード）
+            let rawText = (typeof message === "string" ? message : message.text) || "";
+            if (rawText.length > 25) {
+                rawText = rawText.slice(0, 25);
+            }
+            chip.textContent = rawText;
 
             const color = colorFor(colorIndex);
             chip.style.color = color;
@@ -317,9 +318,8 @@
             const left = getOptimalLaneLeft();
             chip.style.left = `${left}vw`;
 
-            // 上昇速度を全員固定(16秒)にし、後発チップによる追突を防止
             const duration = 16;
-            const swayAmount = (Math.random() > 0.5 ? 1 : -1) * 12; // 控えめな左右スウェイ(±12px)
+            const swayAmount = (Math.random() > 0.5 ? 1 : -1) * 12;
             chip.style.setProperty("--sway", `${swayAmount}px`);
             chip.style.animationDuration = `${duration}s, 3s`;
 
