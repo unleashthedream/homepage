@@ -227,7 +227,16 @@
         const stage = document.getElementById("stage");
         const emptyState = document.getElementById("emptyState");
 
-        const COLORS = ["#ff3d81", "#34f5c5", "#ffb238"];
+        const COLORS = [
+            "#ff3d81", // ネオンピンク
+            "#34f5c5", // エレクトリックシアン
+            "#ffb238", // アンバーゴールド
+            "#a855f7", // コズミックパープル
+            "#38bdf8", // スカイブルー
+            "#ff6b6b", // サンセットコーラル
+            "#4ade80", // ライムエメラルド
+            "#f5d061"  // シャンパンゴールド
+        ];
         const MAX_ON_SCREEN = 40;
         let onScreen = 0;
         const seen = new Set();
@@ -353,10 +362,14 @@
             });
         }
 
-        let colorCursor = 0;
+        let lastColorIndex = -1;
         function nextColorIndex() {
-            colorCursor = (colorCursor + 1) % COLORS.length;
-            return colorCursor;
+            let next;
+            do {
+                next = Math.floor(Math.random() * COLORS.length);
+            } while (next === lastColorIndex && COLORS.length > 1);
+            lastColorIndex = next;
+            return next;
         }
 
         socket.addEventListener("open", () => {
