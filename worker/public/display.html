@@ -3,17 +3,18 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>UNLEASH THE DREAM — Display</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UNLEASH THE DREAM — メッセージを送る</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&family=Noto+Sans+JP:wght@400;500;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600;700&display=swap"
         rel="stylesheet">
     <style>
         :root {
             --bg: #08070d;
             --bg-2: #14101f;
+            --card: #17131f;
             --ink: #f4f1f8;
             --ink-dim: #8d84a3;
             --pink: #ff3d81;
@@ -28,195 +29,219 @@
         html,
         body {
             margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(ellipse at 50% 110%, var(--bg-2) 0%, var(--bg) 60%);
-            overflow: hidden;
-            font-family: "Noto Sans JP", "Inter", sans-serif;
+            min-height: 100%;
+            background: radial-gradient(ellipse at 50% -10%, var(--bg-2) 0%, var(--bg) 55%);
+            color: var(--ink);
+            font-family: "Inter", sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Ambient sweeping spotlight — background motion */
-        .sweep {
-            position: fixed;
-            top: -20%;
-            left: 50%;
-            width: 140vmax;
-            height: 140vmax;
-            transform: translateX(-50%);
-            background: conic-gradient(from 0deg,
-                    transparent 0deg,
-                    rgba(255, 61, 129, 0.05) 8deg,
-                    transparent 20deg,
-                    transparent 340deg);
-            animation: rotate 22s linear infinite;
-            pointer-events: none;
-        }
-
-        @keyframes rotate {
-            from {
-                transform: translateX(-50%) rotate(0deg);
-            }
-
-            to {
-                transform: translateX(-50%) rotate(360deg);
-            }
-        }
-
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+        .wrap {
+            min-height: 100dvh;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 28px 40px;
-            z-index: 10;
+            flex-direction: column;
+            padding: max(28px, env(safe-area-inset-top)) 22px max(28px, env(safe-area-inset-bottom));
         }
 
         .brand {
-            font-family: "Space Grotesk", sans-serif;
-            font-weight: 700;
-            font-size: 20px;
-            letter-spacing: 0.02em;
-            color: var(--ink);
             display: flex;
             align-items: center;
             gap: 10px;
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 0.03em;
+            color: var(--ink-dim);
         }
 
         .brand .dot {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             background: var(--pink);
-            box-shadow: 0 0 12px 2px var(--pink);
-            animation: pulse 1.6s ease-in-out infinite;
+            box-shadow: 0 0 10px 2px var(--pink);
         }
 
-        @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-
-            50% {
-                opacity: 0.5;
-                transform: scale(0.75);
-            }
-        }
-
-        .qr-hint {
-            font-size: 13px;
-            color: var(--ink-dim);
-            letter-spacing: 0.04em;
-        }
-
-        .stage {
-            position: fixed;
-            inset: 0;
-        }
-
-        .chip {
-            position: absolute;
-            bottom: -160px;
-            font-family: "Space Grotesk", "Noto Sans JP", sans-serif;
-            font-weight: 500;
-            font-size: clamp(18px, 2.2vw, 28px);
-            color: var(--ink);
-            padding: 14px 24px;
-            border-radius: 24px;
-            max-width: min(320px, 24vw);
-            white-space: normal;
-            word-break: break-word;
-            overflow-wrap: break-word;
-            line-height: 1.45;
-            text-align: center;
-            background: rgba(20, 16, 31, 0.65);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            animation-name: rise, sway;
-            animation-timing-function: linear, ease-in-out;
-            animation-iteration-count: 1, infinite;
-            will-change: transform, opacity;
-        }
-
-        @keyframes rise {
-            0% {
-                bottom: -160px;
-                opacity: 0;
-            }
-
-            6% {
-                opacity: 1;
-            }
-
-            88% {
-                opacity: 1;
-            }
-
-            100% {
-                bottom: 108vh;
-                opacity: 0;
-            }
-        }
-
-        @keyframes sway {
-
-            0%,
-            100% {
-                margin-left: 0;
-            }
-
-            50% {
-                margin-left: var(--sway, 12px);
-            }
-        }
-
-        .empty-state {
-            position: absolute;
-            inset: 0;
+        main {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            align-items: center;
             justify-content: center;
-            gap: 18px;
-            color: var(--ink-dim);
-            text-align: center;
-            transition: opacity 0.6s ease;
+            padding: 24px 0 8px;
         }
 
-        .empty-state.hide {
-            opacity: 0;
-            pointer-events: none;
+        h1 {
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 700;
+            font-size: clamp(28px, 8vw, 38px);
+            line-height: 1.15;
+            margin: 0 0 8px;
+        }
+
+        h1 .accent {
+            color: var(--pink);
+        }
+
+        .sub {
+            color: var(--ink-dim);
+            font-size: 15px;
+            margin: 0 0 28px;
+            line-height: 1.6;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .field {
+            position: relative;
+            background: var(--card);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 18px 18px 14px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .field:focus-within {
+            border-color: var(--pink);
+            box-shadow: 0 0 0 4px rgba(255, 61, 129, 0.12);
+        }
+
+        textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            resize: none;
+            color: var(--ink);
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 20px;
+            line-height: 1.5;
+            min-height: 84px;
+        }
+
+        textarea::placeholder {
+            color: #5a516e;
+        }
+
+        .meta-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 6px;
+        }
+
+        .counter {
+            font-size: 12px;
+            color: var(--ink-dim);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .counter.warn {
+            color: var(--amber);
+        }
+
+        .counter.max {
+            color: var(--pink);
+        }
+
+        button {
+            appearance: none;
+            border: none;
+            border-radius: 999px;
+            padding: 18px;
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 700;
+            font-size: 17px;
+            letter-spacing: 0.02em;
+            color: #08070d;
+            background: linear-gradient(120deg, var(--pink), #ff7ab0);
+            box-shadow: 0 12px 30px -10px rgba(255, 61, 129, 0.55);
+            cursor: pointer;
+            transition: transform 0.15s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button:active {
+            transform: scale(0.97);
+        }
+
+        button:disabled {
+            opacity: 0.45;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .status {
+            min-height: 22px;
+            margin-top: 14px;
+            font-size: 14px;
+            text-align: center;
+            transition: opacity 0.25s ease;
+        }
+
+        .status.ok {
+            color: var(--cyan);
+        }
+
+        .status.err {
+            color: var(--amber);
+        }
+
+        footer {
+            text-align: center;
+            color: #4d4560;
+            font-size: 12px;
+            padding-top: 22px;
+        }
+
+        /* success flash on the field when a message lands */
+        @keyframes flash {
+            0% {
+                box-shadow: 0 0 0 0 rgba(52, 245, 197, 0.5);
+            }
+
+            100% {
+                box-shadow: 0 0 0 14px rgba(52, 245, 197, 0);
+            }
+        }
+
+        .field.sent {
+            animation: flash 0.6s ease-out;
         }
     </style>
 </head>
 
 <body>
-
-    <div class="sweep"></div>
-
-    <header>
+    <div class="wrap">
         <div class="brand"><span class="dot"></span>UNLEASH THE DREAM</div>
-        <div class="qr-hint">QRを読み取ってメッセージを送ろう</div>
-    </header>
 
-    <div class="stage" id="stage"></div>
+        <main>
+            <h1>今、伝えたい<br><span class="accent">ひとこと</span>を。</h1>
+            <p class="sub">送信した文字がステージのスクリーンに映し出されます。名前は表示されません。</p>
 
-    <div class="empty-state" id="emptyState">
-        <div>まだメッセージはありません</div>
-        <div>QRコードを読み取って、最初の一言を送ってみよう</div>
+            <form id="postForm">
+                <div class="field" id="field">
+                    <textarea id="text" maxlength="25" rows="3" placeholder="ここに入力…" autocomplete="off"
+                        autocapitalize="sentences"></textarea>
+                    <div class="meta-row">
+                        <span class="counter" id="counter">0 / 25</span>
+                    </div>
+                </div>
+
+                <button type="submit" id="sendBtn">スクリーンに送る</button>
+                <div class="status" id="status"></div>
+            </form>
+        </main>
+
+        <footer>Concert Wall — live text, no signup</footer>
     </div>
 
     <script>
-        // Plain WebSocket — no Socket.io
+        // Plain WebSocket — no Socket.io — so this same client code will also
+        // work against the future Cloudflare Durable Object version.
         const wsProtocol = location.protocol === "https:" ? "wss:" : "ws:";
-        const wsHost = location.host || "localhost:3000";
-        const socket = new WebSocket(`${wsProtocol}//${wsHost}/ws`);
+        const socket = new WebSocket(`${wsProtocol}//${location.host}/ws`);
 
         function send(obj) {
             if (socket.readyState === WebSocket.OPEN) {
@@ -224,124 +249,61 @@
             }
         }
 
-        const stage = document.getElementById("stage");
-        const emptyState = document.getElementById("emptyState");
+        const form = document.getElementById("postForm");
+        const field = document.getElementById("field");
+        const textarea = document.getElementById("text");
+        const counter = document.getElementById("counter");
+        const sendBtn = document.getElementById("sendBtn");
+        const status = document.getElementById("status");
 
-        const COLORS = ["#ff3d81", "#34f5c5", "#ffb238"];
-        const MAX_ON_SCREEN = 40;
-        let onScreen = 0;
-        const seen = new Set();
+        const MAX_LEN = 25;
+        let cooling = false;
 
-        // ── レーン（列）位置管理 ─────────────────────────
-        const LANES_LEFT_VW = [8, 38, 68];
-        const laneLastUsed = new Array(LANES_LEFT_VW.length).fill(0);
-        let lastLaneIndex = -1;
+        function updateCounter() {
+            const len = textarea.value.length;
+            counter.textContent = `${len} / ${MAX_LEN}`;
+            counter.classList.toggle("warn", len >= MAX_LEN - 5 && len < MAX_LEN);
+            counter.classList.toggle("max", len >= MAX_LEN);
+        }
 
-        function getOptimalLaneLeft() {
-            const now = Date.now();
-            let bestLane = 0;
-            let maxElapsed = -1;
+        textarea.addEventListener("input", updateCounter);
 
-            for (let i = 0; i < LANES_LEFT_VW.length; i++) {
-                if (i === lastLaneIndex && LANES_LEFT_VW.length > 1) continue;
-                const elapsed = now - laneLastUsed[i];
-                if (elapsed > maxElapsed) {
-                    maxElapsed = elapsed;
-                    bestLane = i;
+        function setStatus(text, kind) {
+            status.textContent = text;
+            status.className = "status" + (kind ? ` ${kind}` : "");
+        }
+
+        function startCooldown(ms) {
+            cooling = true;
+            sendBtn.disabled = true;
+            let remaining = Math.ceil(ms / 1000);
+            const original = "スクリーンに送る";
+            sendBtn.textContent = `少し待ってね (${remaining})`;
+            const interval = setInterval(() => {
+                remaining -= 1;
+                if (remaining <= 0) {
+                    clearInterval(interval);
+                    sendBtn.textContent = original;
+                    sendBtn.disabled = false;
+                    cooling = false;
+                } else {
+                    sendBtn.textContent = `少し待ってね (${remaining})`;
                 }
+            }, 1000);
+        }
+
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            if (cooling) return;
+
+            const value = textarea.value.trim();
+            if (!value) {
+                setStatus("文字を入力してください", "err");
+                return;
             }
 
-            laneLastUsed[bestLane] = now;
-            lastLaneIndex = bestLane;
-
-            const baseLeft = LANES_LEFT_VW[bestLane];
-            const jitter = (Math.random() - 0.5) * 6;
-            return Math.min(75, Math.max(5, baseLeft + jitter));
-        }
-
-        // ── キュー管理 ──────────────────
-        const messageQueue = [];
-        let isProcessingQueue = false;
-
-        function enqueueMessage(message) {
-            if (!message) return;
-            if (message.id) {
-                if (seen.has(message.id)) return;
-                seen.add(message.id);
-            }
-            messageQueue.push(message);
-            processQueue();
-        }
-
-        function processQueue() {
-            if (isProcessingQueue || messageQueue.length === 0) return;
-            isProcessingQueue = true;
-
-            const m = messageQueue.shift();
-            spawnChip(m, nextColorIndex());
-
-            const delay = messageQueue.length > 8 ? 1400 : 2000;
-            setTimeout(() => {
-                isProcessingQueue = false;
-                processQueue();
-            }, delay);
-        }
-
-        function colorFor(index) {
-            return COLORS[index % COLORS.length];
-        }
-
-        function spawnChip(message, colorIndex) {
-            emptyState.classList.add("hide");
-
-            if (onScreen >= MAX_ON_SCREEN) {
-                const oldest = stage.querySelector(".chip");
-                if (oldest) oldest.remove();
-                onScreen = Math.max(0, onScreen - 1);
-            }
-
-            const chip = document.createElement("div");
-            chip.className = "chip";
-            
-            // 最大25文字制限（フロントエンド側制限のセーフティガード）
-            let rawText = (typeof message === "string" ? message : message.text) || "";
-            if (rawText.length > 25) {
-                rawText = rawText.slice(0, 25);
-            }
-            chip.textContent = rawText;
-
-            const color = colorFor(colorIndex);
-            chip.style.color = color;
-            chip.style.boxShadow = `0 0 24px -6px ${color}88`;
-            chip.style.borderColor = `${color}55`;
-
-            const left = getOptimalLaneLeft();
-            chip.style.left = `${left}vw`;
-
-            const duration = 16;
-            const swayAmount = (Math.random() > 0.5 ? 1 : -1) * 12;
-            chip.style.setProperty("--sway", `${swayAmount}px`);
-            chip.style.animationDuration = `${duration}s, 3s`;
-
-            chip.addEventListener("animationend", (e) => {
-                if (e.animationName === "rise") {
-                    chip.remove();
-                    onScreen = Math.max(0, onScreen - 1);
-                }
-            });
-
-            stage.appendChild(chip);
-            onScreen += 1;
-        }
-
-        let colorCursor = 0;
-        function nextColorIndex() {
-            colorCursor = (colorCursor + 1) % COLORS.length;
-            return colorCursor;
-        }
-
-        socket.addEventListener("open", () => {
-            send({ type: "history" });
+            send({ type: "post", text: value });
+            setStatus("送信中…", "");
         });
 
         socket.addEventListener("message", (event) => {
@@ -352,15 +314,29 @@
                 return;
             }
 
-            if (data.type === "history" && Array.isArray(data.messages)) {
-                data.messages.forEach((m) => enqueueMessage(m));
+            if (data.type === "accepted") {
+                setStatus("スクリーンに届きました ✓", "ok");
+                textarea.value = "";
+                updateCounter();
+                field.classList.remove("sent");
+                void field.offsetWidth; // restart animation
+                field.classList.add("sent");
+                startCooldown(3000);
                 return;
             }
 
-            if (data.type === "message" && data.message) {
-                enqueueMessage(data.message);
+            if (data.type === "rejected") {
+                if (data.reason === "too-fast") {
+                    setStatus("連続投稿はできません。少し待ってね", "err");
+                } else if (data.reason === "empty") {
+                    setStatus("文字を入力してください", "err");
+                } else {
+                    setStatus("送信できませんでした。もう一度お試しください", "err");
+                }
             }
         });
+
+        updateCounter();
     </script>
 </body>
 
