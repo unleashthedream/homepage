@@ -1503,9 +1503,93 @@
       </div>
 
       <div class="accordion-item" id="acc-guide" style="margin-top:24px;">
-        <button class="accordion-btn" onclick="toggleAcc('acc-guide')"><span>案内人・ガイド役・司会</span><span
+        <button class="accordion-btn" onclick="toggleAcc('acc-guide')"><span>物語の案内人・住人・コラボレーター</span><span
             class="mark">＋</span></button>
-        <div class="accordion-panel">準備中</div>
+        <div class="accordion-panel" style="padding-top:16px;">
+
+          <!-- 物語の案内人（2名） -->
+          <h3 class="serif" style="font-size:14px;color:var(--gold);margin:8px 0 12px;">物語の案内人</h3>
+          <div class="cast-grid" style="grid-template-columns:repeat(2,1fr);max-width:480px;margin-bottom:24px;">
+            <div class="cast-card" onclick="openModal('清成 月恵','物語の案内人','image/cast/kiyonari.png','司書')">
+              <div class="cast-avatar"><img src="image/cast/kiyonari.png" alt="清成 月恵"></div>
+              <div class="cast-name">清成 月恵</div>
+              <div class="cast-role">司書</div>
+            </div>
+            <div class="cast-card" onclick="openModal('一ノ清 まこと','物語の案内人','image/cast/ichinose.png','妖精')">
+              <div class="cast-avatar"><img src="image/cast/ichinose.png" alt="一ノ清 まこと"></div>
+              <div class="cast-name">一ノ清 まこと</div>
+              <div class="cast-role">妖精</div>
+            </div>
+          </div>
+
+          <!-- 物語世界の住人（6名） -->
+          <h3 class="serif" style="font-size:14px;color:var(--gold);margin:24px 0 12px;">物語世界の住人</h3>
+          <div class="cast-grid" style="margin-bottom:24px;">
+            <div class="cast-card" onclick="openModal('宮原 周作','物語世界の住人','image/cast/shusaku.png','語り')">
+              <div class="cast-avatar">
+                <img src="image/cast/shusaku.png" alt="宮原 周作">
+              </div>
+              <div class="cast-name">宮原 周作</div>
+              <div class="cast-role">語り</div>
+            </div>
+            <div class="cast-card" onclick="openModal('なるとし','物語世界の住人','image/cast/narutoshi.jpg','ギター弾き語り')">
+              <div class="cast-avatar">
+                <img src="image/cast/narutoshi.jpg" alt="なるとし">
+              </div>
+              <div class="cast-name">なるとし</div>
+              <div class="cast-role">ギター弾き語り</div>
+            </div>
+            <div class="cast-card" onclick="openModal('天野 盛介','物語世界の住人','image/cast/seisuke.png','ピアノ演奏')">
+              <div class="cast-avatar">
+                <img src="image/cast/seisuke.png" alt="天野 盛介">
+              </div>
+              <div class="cast-name">天野 盛介</div>
+              <div class="cast-role">ピアノ演奏</div>
+            </div>
+            <div class="cast-card" onclick="openModal('阿部 元','物語世界の住人','image/cast/hajime.jpg','歌')">
+              <div class="cast-avatar">
+                <img src="image/cast/hajime.jpg" alt="阿部 元">
+              </div>
+              <div class="cast-name">阿部 元</div>
+              <div class="cast-role">歌</div>
+            </div>
+            <div class="cast-card" onclick="openModal('香星舞楽獅子護摩之図','物語世界の住人','image/cast/buraku.png','舞楽')">
+              <div class="cast-avatar">
+                <img src="image/cast/buraku.png" alt="香星舞楽獅子護摩之図">
+              </div>
+              <div class="cast-name">香星舞楽獅子護摩之図</div>
+              <div class="cast-role">舞楽</div>
+            </div>
+            <div class="cast-card"
+              onclick="openModal('日本を元気にするカップル','物語世界の住人','image/cast/japanese_energy.jpg','インカンテーション')">
+              <div class="cast-avatar">
+                <img src="image/cast/japanese_energy.jpg" alt="日本を元気にするカップル">
+              </div>
+              <div class="cast-name">日本を元気にするカップル</div>
+              <div class="cast-role">インカンテーション</div>
+            </div>
+          </div>
+
+          <!-- コラボレーター（2名） -->
+          <h3 class="serif" style="font-size:14px;color:var(--gold);margin:24px 0 12px;">コラボレーター</h3>
+          <div class="cast-grid" style="grid-template-columns:repeat(2,1fr);max-width:480px;margin-bottom:12px;">
+            <div class="cast-card" onclick="openModal('高崎 将樹','コラボレーター','image/cast/masaki.png','ナビゲーター')">
+              <div class="cast-avatar">
+                <img src="image/cast/masaki.png" alt="高崎 将樹">
+              </div>
+              <div class="cast-name">高崎 将樹</div>
+              <div class="cast-role">ナビゲーター</div>
+            </div>
+            <div class="cast-card" onclick="openModal('サカキミヤコ','コラボレーター','image/cast/sakaki.jpg','VJ')">
+              <div class="cast-avatar">
+                <img src="image/cast/sakaki.jpg" alt="サカキミヤコ">
+              </div>
+              <div class="cast-name">サカキミヤコ</div>
+              <div class="cast-role">VJ</div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   </section>
@@ -1636,7 +1720,7 @@
           <td>4,000円</td>
           <td>5,000円</td>
           <td>6,000円</td>
-          <td>1,500円</td>
+          <td>1,000円</td>
           <td>無料</td>
         </tr>
         <tr>
@@ -1644,7 +1728,7 @@
           <td>3,500円</td>
           <td>4,000円</td>
           <td>4,500円</td>
-          <td>1,000円</td>
+          <td>無料</td>
           <td>無料</td>
         </tr>
       </table>
@@ -1754,11 +1838,11 @@
   <footer>
     <div class="wrap">
       <div class="sns-row">
-        <a href="#" target="_blank" rel="noopener">X</a>
-        <a href="#" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://x.com/UnleashDreamFes" target="_blank" rel="noopener">X</a>
+        <a href="https://www.instagram.com/unleashthedream/" target="_blank" rel="noopener">Instagram</a>
         <a href="#hero">Topへ戻る</a>
       </div>
-      <div>Unleash the Dream　｜　<a href="#">特定商取引法に基づく表記</a></div>
+      <div>Unleash the Dream　｜　<a href="https://unleash-the-dream.com/legal">特定商取引法に基づく表記</a></div>
     </div>
   </footer>
 
@@ -1769,7 +1853,8 @@
       <div class="modal-avatar" id="modalAvatar">?</div>
       <h3 class="serif center" id="modalName" style="margin:0 0 6px;"></h3>
       <p class="center" id="modalRole" style="color:var(--gold);font-size:12px;margin:0 0 16px;"></p>
-      <p id="modalBio" style="font-size:13px;opacity:.85;line-height:1.7;white-space:pre-line;"></p>
+      <p id="modalBio" class="center"
+        style="font-size:14px;opacity:.85;line-height:1.7;white-space:pre-line;text-align:center;"></p>
     </div>
   </div>
 
@@ -1816,7 +1901,7 @@
     function openModal(name, role, imgSrc, bio) {
       document.getElementById('modalName').textContent = name;
       document.getElementById('modalRole').textContent = role;
-      document.getElementById('modalBio').textContent = bio || 'プロフィール本文がここに入ります。実績・想い・見どころなどを記載します。';
+      document.getElementById('modalBio').textContent = bio || '';
       var avatarEl = document.getElementById('modalAvatar');
       if (imgSrc) {
         avatarEl.innerHTML = '<img src="' + imgSrc + '" alt="' + name + '">';
