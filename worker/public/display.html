@@ -167,7 +167,7 @@
             }
 
             50% {
-                margin-left: var(--sway, 24px);
+                margin-left: var(--sway, 12px);
             }
         }
 
@@ -211,7 +211,7 @@
     <div class="stage" id="stage"></div>
 
     <div class="empty-state" id="emptyState">
-        <div>まだメッセージはありません</div>
+        <div class="big">まだメッセージはありません</div>
         <div>QRコードを読み取って、最初の一言を送ってみよう</div>
     </div>
 
@@ -235,9 +235,9 @@
         let onScreen = 0;
         const seen = new Set();
 
-        // ── レーン（列）位置管理 (重なり防止) ─────────────────────────
-        const NUM_LANES = 6;
-        const laneLastUsed = new Array(NUM_LANES).fill(0);
+        // ── レーン（列）位置管理 (被りゼロの広め3レーン配置) ────────────────
+        const LANES_LEFT_VW = [8, 38, 68]; // 左・中央・右の広め3レーン
+        const laneLastUsed = new Array(LANES_LEFT_VW.length).fill(0);
         let lastLaneIndex = -1;
 
         function getOptimalLaneLeft() {
@@ -245,9 +245,9 @@
             let bestLane = 0;
             let maxElapsed = -1;
 
-            // 直近で最も使われていないレーンを選択
-            for (let i = 0; i < NUM_LANES; i++) {
-                if (i === lastLaneIndex && NUM_LANES > 1) continue;
+            // 直近で最も使われておらず、前回と重複しないレーンを選択
+            for (let i = 0; i < LANES_LEFT_VW.length; i++) {
+                if (i === lastLaneIndex && LANES_LEFT_VW.length > 1) continue;
                 const elapsed = now - laneLastUsed[i];
                 if (elapsed > maxElapsed) {
                     maxElapsed = elapsed;
@@ -258,13 +258,12 @@
             laneLastUsed[bestLane] = now;
             lastLaneIndex = bestLane;
 
-            const laneWidth = 72 / NUM_LANES;
-            const baseLeft = 6 + bestLane * laneWidth;
-            const jitter = (Math.random() - 0.5) * (laneWidth * 0.35);
-            return Math.min(80, Math.max(5, baseLeft + jitter));
+            const baseLeft = LANES_LEFT_VW[bestLane];
+            const jitter = (Math.random() - 0.5) * 6; // ±3vwの微ブレ
+            return Math.min(75, Math.max(5, baseLeft + jitter));
         }
 
-        // ── キュー管理 (同時・連続投稿の重なり防止) ───────────────────
+        // ── キュー管理 (垂直衝突防止の十分な間隔確保) ──────────────────
         const messageQueue = [];
         let isProcessingQueue = false;
 
@@ -285,8 +284,8 @@
             const m = messageQueue.shift();
             spawnChip(m, nextColorIndex());
 
-            // 混雑度に合わせて打ち上げ間隔を動的に調整 (700ms〜1200ms)
-            const delay = messageQueue.length > 5 ? 700 : 1200;
+            // 垂直方向の被りを防ぐため、最小1.8秒の間隔をあけて打ち上げ
+            const delay = messageQueue.length > 8 ? 1400 : 2000;
             setTimeout(() => {
                 isProcessingQueue = false;
                 processQueue();
@@ -300,7 +299,6 @@
         function spawnChip(message, colorIndex) {
             emptyState.classList.add("hide");
 
-            // 画面上が飽和している場合は古い要素を破棄
             if (onScreen >= MAX_ON_SCREEN) {
                 const oldest = stage.querySelector(".chip");
                 if (oldest) oldest.remove();
@@ -316,14 +314,14 @@
             chip.style.boxShadow = `0 0 24px -6px ${color}88`;
             chip.style.borderColor = `${color}55`;
 
-            // 重ならないレーン位置を取得
             const left = getOptimalLaneLeft();
             chip.style.left = `${left}vw`;
 
-            const duration = 13 + Math.random() * 6;
-            const swayAmount = (Math.random() > 0.5 ? 1 : -1) * (16 + Math.random() * 20);
+            // 上昇速度を全員固定(16秒)にし、後発チップによる追突を防止
+            const duration = 16;
+            const swayAmount = (Math.random() > 0.5 ? 1 : -1) * 12; // 控えめな左右スウェイ(±12px)
             chip.style.setProperty("--sway", `${swayAmount}px`);
-            chip.style.animationDuration = `${duration}s, ${2.5 + Math.random() * 1.5}s`;
+            chip.style.animationDuration = `${duration}s, 3s`;
 
             chip.addEventListener("animationend", (e) => {
                 if (e.animationName === "rise") {
