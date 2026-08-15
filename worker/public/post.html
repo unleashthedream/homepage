@@ -217,15 +217,17 @@
         <div class="brand"><span class="dot"></span>UNLEASH THE DREAM</div>
 
         <main>
-            <h1>今、伝えたい<br><span class="accent">ひとこと</span>を。</h1>
-            <p class="sub">送信した文字がステージのスクリーンに映し出されます。名前は表示されません。</p>
+            <h1>今、感じている<br><span class="accent">ひとこと</span>を。</h1>
+            <p class="sub">
+                送信した文字がステージのスクリーンに映し出されます。名前は表示されません。<br>「今の気持ち」「やりたいこと」「これから」などなんでも自由に書いてください。
+            </p>
 
             <form id="postForm">
                 <div class="field" id="field">
-                    <textarea id="text" maxlength="25" rows="3" placeholder="ここに入力…" autocomplete="off"
+                    <textarea id="text" maxlength="40" rows="3" placeholder="ここに入力…" autocomplete="off"
                         autocapitalize="sentences"></textarea>
                     <div class="meta-row">
-                        <span class="counter" id="counter">0 / 25</span>
+                        <span class="counter" id="counter">0 / 40</span>
                     </div>
                 </div>
 
@@ -256,7 +258,7 @@
         const sendBtn = document.getElementById("sendBtn");
         const status = document.getElementById("status");
 
-        const MAX_LEN = 25;
+        const MAX_LEN = 40;
         let cooling = false;
 
         function updateCounter() {
